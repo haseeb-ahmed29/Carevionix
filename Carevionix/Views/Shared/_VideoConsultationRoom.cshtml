@@ -1,0 +1,239 @@
+@model Consultation
+@{
+    var role = (ViewData["VideoRole"] as string) ?? "patient";
+    var remoteName = role == "doctor"
+        ? Model.Appointment.Patient.User.FullName
+        : Model.Appointment.Doctor.User.FullName;
+    var room = Model.SessionReference ?? $"room-{Model.AppointmentId}";
+    var isAudio = Model.ConsultationType == ConsultationType.Audio;
+}
+
+<section class="video-room" data-room="@room" data-role="@role" data-call-type="@Model.ConsultationType">
+    <div class="video-room-header">
+        <div>
+            <div class="eyebrow mb-2">Secure @(isAudio ? "audio" : "virtual") consultation</div>
+            <h1 class="page-title h3 mb-1">@remoteName</h1>
+            <p class="text-muted-strong mb-0">Room: <strong>@room</strong></p>
+        </div>
+        <div class="video-status" id="callStatus">Waiting for participant</div>
+    </div>
+
+    <div class="video-stage">
+        <div class="remote-frame">
+            <video id="remoteVideo" autoplay playsinline></video>
+            <div class="video-label">@remoteName</div>
+            <div class="waiting-layer" id="waitingLayer">
+                <strong>Ready to connect</strong>
+                <span>Ask the other participant to open the same appointment room.</span>
+            </div>
+        </div>
+        <div class="local-frame">
+            <video id="localVideo" autoplay playsinline muted></video>
+            <span>You</span>
+        </div>
+    </div>
+
+    <div class="call-controls" aria-label="Video call controls">
+        <button class="call-btn primary" type="button" id="joinBtn">Join</button>
+        <button class="call-btn" type="button" id="micBtn" disabled>Mic</button>
+        @if (!isAudio)
+        {
+            <button class="call-btn" type="button" id="cameraBtn" disabled>Camera</button>
+            <button class="call-btn" type="button" id="screenBtn" disabled>Screen</button>
+        }
+        <button class="call-btn danger" type="button" id="leaveBtn" disabled>Leave</button>
+    </div>
+</section>
+
+<script>
+(() => {
+    const room = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(room));
+    const role = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(role));
+    const isAudio = @Json.Serialize(isAudio);
+    const isDoctor = role === 'doctor';
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const waitingLayer = document.getElementById('waitingLayer');
+    const statusText = document.getElementById('callStatus');
+    const joinBtn = document.getElementById('joinBtn');
+    const micBtn = document.getElementById('micBtn');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const screenBtn = document.getElementById('screenBtn');
+    const leaveBtn = document.getElementById('leaveBtn');
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+    let localStream;
+    let screenStream;
+    let peer;
+    let pollTimer;
+    let lastSignalId = 0;
+    let makingOffer = false;
+
+    const setStatus = (text) => statusText.textContent = text;
+    const setControls = (joined) => {
+        joinBtn.disabled = joined;
+        micBtn.disabled = !joined;
+        if (cameraBtn) cameraBtn.disabled = !joined;
+        if (screenBtn) screenBtn.disabled = !joined;
+        leaveBtn.disabled = !joined;
+    };
+
+    async function sendSignal(type, payload = {}) {
+        await fetch('/VideoSignal/Send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'RequestVerificationToken': token } : {})
+            },
+            body: JSON.stringify({ room, type, payload: JSON.stringify(payload) })
+        });
+    }
+
+    async function pollSignals() {
+        const response = await fetch(`/VideoSignal/Poll?room=${encodeURIComponent(room)}&after=${lastSignalId}`);
+        if (!response.ok) {
+            setStatus('Room access failed');
+            return;
+        }
+
+        const messages = await response.json();
+        for (const message of messages) {
+            lastSignalId = Math.max(lastSignalId, message.id);
+            await handleSignal(message.type, JSON.parse(message.payload || '{}'));
+        }
+    }
+
+    function createPeer() {
+        const pc = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        pc.onicecandidate = event => {
+            if (event.candidate) {
+                sendSignal('ice', event.candidate);
+            }
+        };
+        pc.ontrack = event => {
+            remoteVideo.srcObject = event.streams[0];
+            waitingLayer.classList.add('d-none');
+            setStatus('Connected');
+        };
+        pc.onconnectionstatechange = () => {
+            if (pc.connectionState === 'connected') setStatus('Connected');
+            if (['failed', 'disconnected', 'closed'].includes(pc.connectionState)) setStatus('Participant disconnected');
+        };
+
+        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+        return pc;
+    }
+
+    async function makeOffer() {
+        if (!peer || makingOffer) return;
+        makingOffer = true;
+        try {
+            await peer.setLocalDescription(await peer.createOffer());
+            await sendSignal('offer', peer.localDescription);
+            setStatus('Calling participant');
+        } finally {
+            makingOffer = false;
+        }
+    }
+
+    async function handleSignal(type, payload) {
+        if (!peer && localStream) {
+            peer = createPeer();
+        }
+
+        if (type === 'ready') {
+            setStatus('Participant joined');
+            if (isDoctor) {
+                await makeOffer();
+            }
+            return;
+        }
+
+        if (type === 'offer') {
+            await peer.setRemoteDescription(payload);
+            await peer.setLocalDescription(await peer.createAnswer());
+            await sendSignal('answer', peer.localDescription);
+            return;
+        }
+
+        if (type === 'answer') {
+            await peer.setRemoteDescription(payload);
+            return;
+        }
+
+        if (type === 'ice' && payload) {
+            await peer.addIceCandidate(payload);
+            return;
+        }
+
+        if (type === 'left') {
+            remoteVideo.srcObject = null;
+            waitingLayer.classList.remove('d-none');
+            setStatus('Participant left');
+        }
+    }
+
+    async function joinCall() {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: !isAudio, audio: true });
+        localVideo.srcObject = localStream;
+        peer = createPeer();
+        setControls(true);
+        setStatus('Joined room');
+        pollTimer = window.setInterval(pollSignals, 1000);
+        await sendSignal('ready');
+        if (isDoctor) {
+            window.setTimeout(makeOffer, 700);
+        }
+    }
+
+    function stopTracks(stream) {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+    }
+
+    function leaveCall() {
+        sendSignal('left');
+        window.clearInterval(pollTimer);
+        if (peer) peer.close();
+        stopTracks(localStream);
+        stopTracks(screenStream);
+        localVideo.srcObject = null;
+        remoteVideo.srcObject = null;
+        waitingLayer.classList.remove('d-none');
+        setControls(false);
+        setStatus('Call ended');
+    }
+
+    micBtn.addEventListener('click', () => {
+        const track = localStream?.getAudioTracks()[0];
+        if (!track) return;
+        track.enabled = !track.enabled;
+        micBtn.classList.toggle('is-off', !track.enabled);
+    });
+
+    cameraBtn?.addEventListener('click', () => {
+        const track = localStream?.getVideoTracks()[0];
+        if (!track) return;
+        track.enabled = !track.enabled;
+        cameraBtn.classList.toggle('is-off', !track.enabled);
+    });
+
+    screenBtn?.addEventListener('click', async () => {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+        const screenTrack = screenStream.getVideoTracks()[0];
+        const sender = peer.getSenders().find(item => item.track?.kind === 'video');
+        await sender.replaceTrack(screenTrack);
+        localVideo.srcObject = screenStream;
+        screenTrack.onended = async () => {
+            const cameraTrack = localStream.getVideoTracks()[0];
+            await sender.replaceTrack(cameraTrack);
+            localVideo.srcObject = localStream;
+        };
+    });
+
+    joinBtn.addEventListener('click', () => joinCall().catch(error => setStatus(error.message)));
+    leaveBtn.addEventListener('click', leaveCall);
+    window.addEventListener('beforeunload', leaveCall);
+})();
+</script>

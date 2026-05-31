@@ -1,0 +1,68 @@
+@model AdminAppointmentHistoryViewModel
+@{
+    ViewData["Title"] = "Appointment History";
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <div class="eyebrow mb-2">History</div>
+            <h1 class="page-title h3 mb-1">All appointment data</h1>
+            <p class="text-muted-strong mb-0">Search by patient or doctor name, then filter by approval status, invoice, payment, or completion state.</p>
+        </div>
+        <a class="btn btn-outline-primary" asp-action="ManageAppointments">Manage Appointments</a>
+    </div>
+</section>
+
+<section class="history-filter-panel mb-4">
+    <form asp-action="History" method="get" class="history-filter-form">
+        <div class="history-search">
+            <label for="historySearch">Search name</label>
+            <input id="historySearch" class="form-control" name="search" value="@Model.Search" placeholder="Patient or doctor name" />
+        </div>
+        <div>
+            <label for="historyStatus">Status</label>
+            <select id="historyStatus" class="form-select" name="status">
+                <option value="All" selected="@(Model.Status == "All")">All statuses</option>
+                <option value="Accepted" selected="@(Model.Status == "Accepted")">Approved</option>
+                <option value="Pending" selected="@(Model.Status == "Pending")">Pending</option>
+                <option value="Rejected" selected="@(Model.Status == "Rejected")">Rejected</option>
+                <option value="Completed" selected="@(Model.Status == "Completed")">Complete</option>
+                <option value="Rescheduled" selected="@(Model.Status == "Rescheduled")">Rescheduled</option>
+                <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
+            </select>
+        </div>
+        <div>
+            <label for="historyInvoice">Invoice</label>
+            <select id="historyInvoice" class="form-select" name="invoice">
+                <option value="All" selected="@(Model.Invoice == "All")">All invoice data</option>
+                <option value="WithInvoice" selected="@(Model.Invoice == "WithInvoice")">Invoice created</option>
+                <option value="NoInvoice" selected="@(Model.Invoice == "NoInvoice")">No invoice</option>
+                <option value="Paid" selected="@(Model.Invoice == "Paid")">Payment received</option>
+                <option value="WaitingPayment" selected="@(Model.Invoice == "WaitingPayment")">Complete unpaid</option>
+            </select>
+        </div>
+        <div class="history-filter-actions">
+            <button class="btn btn-primary" type="submit">Filter</button>
+            <a class="btn btn-outline-dark" asp-action="History">Reset</a>
+        </div>
+    </form>
+
+    <div class="history-filter-chips" aria-label="Quick filters">
+        <a asp-action="History" asp-route-search="@Model.Search" asp-route-status="Accepted" asp-route-invoice="@Model.Invoice">Approved</a>
+        <a asp-action="History" asp-route-search="@Model.Search" asp-route-status="Pending" asp-route-invoice="@Model.Invoice">Pending</a>
+        <a asp-action="History" asp-route-search="@Model.Search" asp-route-status="Rejected" asp-route-invoice="@Model.Invoice">Rejected</a>
+        <a asp-action="History" asp-route-search="@Model.Search" asp-route-status="@Model.Status" asp-route-invoice="WithInvoice">Invoice</a>
+        <a asp-action="History" asp-route-search="@Model.Search" asp-route-status="Completed" asp-route-invoice="@Model.Invoice">Complete</a>
+    </div>
+</section>
+
+<section class="table-card">
+    <div class="table-card-header">
+        <div>
+            <h2>History results</h2>
+            <p class="text-muted-strong mb-0">@Model.Appointments.Count appointment(s) found.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_AdminAppointmentsTable", Model.Appointments)
+</section>

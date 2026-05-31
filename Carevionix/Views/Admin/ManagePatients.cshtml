@@ -1,0 +1,93 @@
+@model AdminUsersViewModel<Patient>
+@{
+    ViewData["Title"] = "Manage Patients";
+}
+
+<section class="section-panel mb-4">
+    <div class="eyebrow mb-2">Admin control</div>
+    <h1 class="page-title h4 mb-3">Add patient</h1>
+    <form asp-action="SavePatient" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <div class="col-md-3"><input name="FullName" class="form-control" placeholder="Full name" required /></div>
+        <div class="col-md-3"><input name="Email" class="form-control" type="email" placeholder="Email" required /></div>
+        <div class="col-md-2"><input name="Password" class="form-control" placeholder="Password" /></div>
+        <div class="col-md-2"><input name="PhoneNumber" class="form-control" placeholder="Phone" /></div>
+        <div class="col-md-2">
+            <select name="IsActive" class="form-select"><option value="true">Active</option><option value="false">Inactive</option></select>
+        </div>
+        <div class="col-md-3"><input name="DateOfBirth" class="form-control" type="date" /></div>
+        <div class="col-md-3"><input name="Gender" class="form-control" placeholder="Gender" /></div>
+        <div class="col-md-3"><input name="InsuranceInfo" class="form-control" placeholder="Insurance" /></div>
+        <div class="col-md-3"><input name="EmergencyContact" class="form-control" placeholder="Emergency contact" /></div>
+        <div class="col-md-6"><input name="Address" class="form-control" placeholder="Address" /></div>
+        <div class="col-md-6"><input name="MedicalHistory" class="form-control" placeholder="Medical history" /></div>
+        <div class="col-12"><button class="btn btn-primary" type="submit">Add patient</button></div>
+    </form>
+</section>
+
+<section class="table-card">
+    <div class="table-card-header">
+        <div>
+            <h1>Patients</h1>
+            <p class="text-muted-strong mb-0">Manage patient identity, contact, health context, and account status.</p>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle admin-edit-table">
+            <thead><tr><th>Patient</th><th>Account</th><th>Medical details</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            @foreach (var patient in Model.Items)
+            {
+                var editFormId = $"patient-edit-{patient.Id}";
+                <tr>
+                    <td><span class="avatar-pill"><img src="@(patient.User.ProfileImagePath ?? Url.Content("~/Images/Petient Penal Hero Image.jpg"))" alt="" /><span>@patient.User.FullName</span></span></td>
+                    <td>
+                        <div class="admin-inline-form">
+                            <input form="@editFormId" type="hidden" name="Id" value="@patient.Id" />
+                            <input form="@editFormId" name="FullName" class="form-control form-control-sm" value="@patient.User.FullName" />
+                            <input form="@editFormId" name="Email" class="form-control form-control-sm" type="email" value="@patient.User.Email" />
+                            <input form="@editFormId" name="PhoneNumber" class="form-control form-control-sm" value="@patient.User.PhoneNumber" placeholder="Phone" />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="admin-inline-form">
+                            <input form="@editFormId" name="DateOfBirth" class="form-control form-control-sm" type="date" value="@(patient.DateOfBirth?.ToString("yyyy-MM-dd"))" />
+                            <input form="@editFormId" name="Gender" class="form-control form-control-sm" value="@patient.Gender" placeholder="Gender" />
+                            <input form="@editFormId" name="Address" class="form-control form-control-sm" value="@patient.Address" placeholder="Address" />
+                            <input form="@editFormId" name="InsuranceInfo" class="form-control form-control-sm" value="@patient.InsuranceInfo" placeholder="Insurance" />
+                            <input form="@editFormId" name="EmergencyContact" class="form-control form-control-sm" value="@patient.EmergencyContact" placeholder="Emergency contact" />
+                            <input form="@editFormId" name="MedicalHistory" class="form-control form-control-sm" value="@patient.MedicalHistory" placeholder="Medical history" />
+                        </div>
+                    </td>
+                    <td>
+                            <select form="@editFormId" name="IsActive" class="form-select form-select-sm">
+                                @if (patient.User.IsActive)
+                                {
+                                    <option value="true" selected>Active</option>
+                                    <option value="false">Inactive</option>
+                                }
+                                else
+                                {
+                                    <option value="true">Active</option>
+                                    <option value="false" selected>Inactive</option>
+                                }
+                            </select>
+                            <span class="badge @(patient.User.IsActive ? "badge-soft" : "badge-warn") mt-2">@(patient.User.IsActive ? "Active" : "Inactive")</span>
+                    </td>
+                    <td class="admin-action-stack">
+                        <form id="@editFormId" asp-action="SavePatient" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                        </form>
+                        <form asp-action="DeletePatient" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@patient.Id" />
+                            <button class="btn btn-sm btn-outline-dark" type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

@@ -1,0 +1,10 @@
+@model Consultation
+@{
+    ViewData["Title"] = Model.ConsultationType == ConsultationType.Audio ? "Audio Consultation" : "Video Consultation";
+}
+
+@{
+    ViewData["VideoRole"] = "patient";
+}
+@Html.AntiForgeryToken()
+<partial name="_VideoConsultationRoom" model="Model" />

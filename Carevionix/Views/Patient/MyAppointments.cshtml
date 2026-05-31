@@ -1,0 +1,13 @@
+@model IReadOnlyList<Appointment>
+@{
+    ViewData["Title"] = "My Appointments";
+}
+
+<section class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+    <div><h1 class="page-title h3 mb-1">My appointments</h1><p class="text-muted-strong mb-0">Track, cancel, reschedule, or open consultations.</p></div>
+    <a class="btn btn-primary align-self-start" asp-action="BookAppointment">Book Appointment</a>
+</section>
+
+<section class="table-card">
+    <partial name="_AppointmentsTable" model="Model" />
+</section>

@@ -1,0 +1,36 @@
+@model LoginDto
+@{
+    ViewData["Title"] = "Login";
+}
+
+<section class="auth-panel">
+    <div class="eyebrow mb-2">Secure access</div>
+    <h1 class="page-title h3 mb-3">Login to Carevionix</h1>
+    <form asp-action="Login" method="post" class="vstack gap-3">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div>
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" autocomplete="username" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+        <div>
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" type="password" autocomplete="current-password" />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+        <label class="form-check">
+            <input asp-for="RememberMe" class="form-check-input" />
+            <span class="form-check-label">Remember me</span>
+        </label>
+        <button class="btn btn-primary" type="submit">Login</button>
+    </form>
+    <div class="d-flex flex-wrap gap-3 mt-4 small">
+        <a asp-action="RegisterPatient">Register</a>
+        <a asp-action="ForgotPassword">Forgot password</a>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

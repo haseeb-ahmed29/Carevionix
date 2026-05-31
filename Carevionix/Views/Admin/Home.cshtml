@@ -1,0 +1,42 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Home";
+}
+
+<section class="panel-home-hero admin-home mb-4">
+    <div>
+        <div class="eyebrow mb-2">Admin home</div>
+        <h1>Carevionix control center</h1>
+        <p>Manage doctors, patients, appointments, reports, invoices, and platform activity from one operational home.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary" asp-action="ManageDoctors">Doctors</a>
+            <a class="btn btn-outline-dark" asp-action="ManagePatients">Patients</a>
+            <a class="btn btn-outline-primary" asp-action="ManageAppointments">Appointments</a>
+            <a class="btn btn-outline-primary" asp-action="SystemControl">System</a>
+        </div>
+    </div>
+    <aside>
+        <span class="status-badge is-active">Platform health</span>
+        <h2>@Model.CompletedConsultations completed</h2>
+        <p>@Model.PendingAppointments appointment request(s) need attention.</p>
+    </aside>
+</section>
+
+<section class="stat-grid mb-4">
+    <div class="stat-tile"><div class="text-muted-strong">Doctors</div><div class="stat-value">@Model.Doctors</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Patients</div><div class="stat-value">@Model.Patients</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Appointments</div><div class="stat-value">@Model.Appointments</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Messages</div><div class="stat-value">@Model.Messages</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Records</div><div class="stat-value">@Model.HealthRecords</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Contacts</div><div class="stat-value">@Model.ContactSubmissions</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Revenue</div><div class="stat-value h4">PKR @Model.Revenue.ToString("N2")</div></div>
+</section>
+
+<div class="quick-actions">
+    <a class="action-link" asp-action="Reports"><strong>Reports</strong><span>Status totals and activity</span></a>
+    <a class="action-link" asp-action="History"><strong>History</strong><span>Search and filter appointment records</span></a>
+    <a class="action-link" asp-action="Analytics"><strong>Analytics</strong><span>Consultation and revenue view</span></a>
+    <a class="action-link" asp-action="ManageHealthRecords"><strong>Records</strong><span>Uploaded medical files</span></a>
+    <a class="action-link" asp-action="ContactSubmissions"><strong>Contact submissions</strong><span>Website inquiries and follow-up</span></a>
+    <a class="action-link" asp-action="Profile"><strong>Admin profile</strong><span>Profile image, contact, and password</span></a>
+</div>

@@ -1,0 +1,232 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Home";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var dashboardController = User.IsInRole("Admin") ? "Admin" : User.IsInRole("Doctor") ? "Doctor" : User.IsInRole("Patient") ? "Patient" : "Home";
+    var currentUser = isAuthenticated ? await UserManager.GetUserAsync(User) : null;
+    var currentUserImage = currentUser?.ProfileImagePath;
+    var currentUserName = !string.IsNullOrWhiteSpace(currentUser?.FullName) ? currentUser.FullName : User.Identity?.Name;
+    var userInitial = !string.IsNullOrWhiteSpace(currentUserName) ? currentUserName.Trim()[0].ToString().ToUpperInvariant() : "C";
+    var showProfileMenu = isAuthenticated &&
+        (string.Equals(currentController, "Admin", StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(currentController, "Doctor", StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(currentController, "Patient", StringComparison.OrdinalIgnoreCase));
+
+    string Active(string controller, string action) =>
+        string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase)
+            ? "active"
+            : string.Empty;
+
+    string Icon(string name) =>
+        $"<i class=\"nav-svg\" data-lucide=\"{name}\" aria-hidden=\"true\"></i>";
+
+    var showPortalSidebar = isAuthenticated &&
+        (string.Equals(currentController, "Admin", StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(currentController, "Doctor", StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(currentController, "Patient", StringComparison.OrdinalIgnoreCase));
+
+    string DashboardLink(string label, string controller, string action, string icon) =>
+        $"<a class=\"sidebar-link {Active(controller, action)}\" href=\"/{controller}/{action}\"><span class=\"sidebar-icon\">{Icon(icon)}</span><span>{label}</span></a>";
+
+    string NavLink(string label, string controller, string action, string icon) =>
+        $"<a class=\"{Active(controller, action)}\" href=\"/{controller}/{action}\"><span class=\"nav-icon\">{Icon(icon)}</span>{label}</a>";
+}<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Carevionix</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Carevionix.styles.css" asp-append-version="true" /></head><body class="@(showPortalSidebar ? "dashboard-body" : "public-body")">
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="loader-orbit">
+            <img src="~/Images/icon.svg" alt="" class="loader-icon" />
+        </div>
+    </div>
+
+    <header class="topbar">
+        <a class="brand-lockup" asp-controller="Home" asp-action="Index">
+            <img src="~/Images/Carevionix logo.png" alt="Carevionix" class="brand-mark" />
+            <span class="brand-wordmark" aria-label="Carevionix">
+                <span class="brand-care">Care</span><span class="brand-vionix">vionix</span>
+            </span>
+        </a>
+
+        <nav class="topnav" aria-label="Primary navigation">
+            @Html.Raw(NavLink("Home", "Home", "Index", "house"))
+            @Html.Raw(NavLink("About", "Home", "About", "info"))
+            @Html.Raw(NavLink("Services", "Home", "Services", "heart-pulse"))
+            @Html.Raw(NavLink("Contact", "Home", "Contact", "mail"))
+        </nav>
+
+        <div class="topbar-actions">
+            @if (showProfileMenu)
+            {
+                <div class="live-clock" id="liveClock" aria-live="polite"></div>
+                <div class="dropdown profile-menu">
+                    <button class="profile-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="@currentUserName">
+                        <span class="profile-avatar">
+                            @if (!string.IsNullOrWhiteSpace(currentUserImage))
+                            {
+                                <img src="@currentUserImage" alt="" />
+                            }
+                            else
+                            {
+                                @userInitial
+                            }
+                        </span>
+                        <span class="profile-name">@currentUserName</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end profile-dropdown">
+                        <a class="dropdown-item" asp-controller="@dashboardController" asp-action="Profile">
+                            <i class="btn-icon" data-lucide="user-round" aria-hidden="true"></i>Profile
+                        </a>
+                        <a class="dropdown-item" asp-controller="@dashboardController" asp-action="Dashboard">
+                            <i class="btn-icon" data-lucide="layout-dashboard" aria-hidden="true"></i>Dashboard
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="px-2">
+                            @Html.AntiForgeryToken()
+                            <button class="dropdown-item text-danger" type="submit">
+                                <i class="btn-icon" data-lucide="log-out" aria-hidden="true"></i>Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a class="btn btn-outline-primary app-btn" asp-controller="Account" asp-action="Login"><i class="btn-icon" data-lucide="log-in" aria-hidden="true"></i>Login</a>
+                <a class="btn btn-primary app-btn" asp-controller="Account" asp-action="RegisterPatient"><i class="btn-icon" data-lucide="user-plus" aria-hidden="true"></i>Register</a>
+            }
+        </div>
+    </header>
+
+    @if (showPortalSidebar)
+    {
+        <aside class="app-sidebar" aria-label="Dashboard navigation">
+            <div class="sidebar-section">
+                <div class="sidebar-label">Workspace</div>
+                @if (User.IsInRole("Patient"))
+                {
+                    @Html.Raw(DashboardLink("Dashboard", "Patient", "Dashboard", "layout-dashboard"))
+                    @Html.Raw(DashboardLink("Doctors", "Patient", "FindDoctors", "stethoscope"))
+                    @Html.Raw(DashboardLink("Appointments", "Patient", "MyAppointments", "calendar-days"))
+                    @Html.Raw(DashboardLink("Video Calls", "Patient", "VideoCalls", "video"))
+                    @Html.Raw(DashboardLink("Records", "Patient", "HealthRecords", "folder"))
+                    @Html.Raw(DashboardLink("Invoices", "Patient", "Invoices", "receipt-text"))
+                    @Html.Raw(DashboardLink("AI Check", "Patient", "AiDiagnosis", "scan-line"))
+                    @Html.Raw(DashboardLink("Profile", "Patient", "Profile", "user-round"))
+                }
+                else if (User.IsInRole("Doctor"))
+                {
+                    @Html.Raw(DashboardLink("Dashboard", "Doctor", "Dashboard", "layout-dashboard"))
+                    @Html.Raw(DashboardLink("Appointments", "Doctor", "Appointments", "calendar-check"))
+                    @Html.Raw(DashboardLink("Video Calls", "Doctor", "VideoCalls", "video"))
+                    @Html.Raw(DashboardLink("Patients", "Doctor", "MyPatients", "users"))
+                    @Html.Raw(DashboardLink("Availability", "Doctor", "Availability", "clock"))
+                    @Html.Raw(DashboardLink("Records", "Doctor", "SharedRecords", "file-text"))
+                    @Html.Raw(DashboardLink("Profile", "Doctor", "Profile", "user-round"))
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    @Html.Raw(DashboardLink("Dashboard", "Admin", "Dashboard", "layout-dashboard"))
+                    @Html.Raw(DashboardLink("Doctors", "Admin", "ManageDoctors", "stethoscope"))
+                    @Html.Raw(DashboardLink("Patients", "Admin", "ManagePatients", "users-round"))
+                    @Html.Raw(DashboardLink("Appointments", "Admin", "ManageAppointments", "calendar-check"))
+                    @Html.Raw(DashboardLink("History", "Admin", "History", "history"))
+                    @Html.Raw(DashboardLink("Records", "Admin", "ManageHealthRecords", "folder"))
+                    @Html.Raw(DashboardLink("Contact", "Admin", "ContactSubmissions", "messages-square"))
+                    @Html.Raw(DashboardLink("Reports", "Admin", "Reports", "bar-chart-3"))
+                    @Html.Raw(DashboardLink("Analytics", "Admin", "Analytics", "pie-chart"))
+                    @Html.Raw(DashboardLink("System", "Admin", "SystemControl", "settings"))
+                    @Html.Raw(DashboardLink("Profile", "Admin", "Profile", "user-round"))
+                }
+            </div>
+        </aside>
+    }
+
+    <main class="app-main @(showPortalSidebar ? "with-sidebar" : string.Empty)">
+        <div class="app-shell">
+            @if (TempData["StatusMessage"] is string statusMessage)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @statusMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @RenderBody()
+        </div>
+    </main>
+
+    @if (!isAuthenticated)
+    {
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="hero-title">Experience Modern Healthcare with Carevionix</h1>
+                        <p class="hero-subtitle">Quality medical care, experienced doctors, and seamless appointment booking at your fingertips.</p>
+                        <div class="hero-actions">
+                            <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="RegisterPatient">Get Started</a>
+                            <a class="btn btn-outline-primary btn-lg" asp-controller="Home" asp-action="About">Learn More</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="~/Images/Home Page hero image.jpg" alt="Carevionix Healthcare" class="img-fluid" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="app-footer">
+            <div class="app-shell">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <a class="footer-lockup" asp-controller="Home" asp-action="Index">
+                            <img src="~/Images/Carevionix logo.png" alt="Carevionix" class="footer-mark" />
+                            <span class="footer-wordmark" aria-label="Carevionix">
+                                <span class="brand-care">Care</span><span class="brand-vionix">vionix</span>
+                            </span>
+                        </a>
+                        <p>Modern healthcare support for patients, doctors, appointments, records, and secure digital care from one connected platform.</p>
+                    </div>
+
+                    <nav class="footer-links" aria-label="Footer navigation">
+                        <h2>Navigation</h2>
+                        <a asp-controller="Home" asp-action="Index">Home</a>
+                        <a asp-controller="Home" asp-action="About">About</a>
+                        <a asp-controller="Home" asp-action="Services">Services</a>
+                        <a asp-controller="Home" asp-action="Contact">Contact</a>
+                    </nav>
+
+                    <div class="footer-links">
+                        <h2>Care Services</h2>
+                        <span>Doctor appointments</span>
+                        <span>Patient health records</span>
+                        <span>Video consultations</span>
+                        <span>Smart care coordination</span>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h2>Get Care</h2>
+                        <p>Book visits, manage records, and stay connected with your care team through Carevionix.</p>
+                        <a class="footer-cta" asp-controller="Account" asp-action="RegisterPatient">
+                            <i class="btn-icon" data-lucide="calendar-plus" aria-hidden="true"></i>Book Appointment
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <span>&copy; 2026 Carevionix. All rights reserved.</span>
+                    <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                </div>
+            </div>
+        </footer>
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)</body></html>

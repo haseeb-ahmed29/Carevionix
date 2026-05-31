@@ -1,0 +1,49 @@
+@model ContactSubmissionDto
+@{
+    ViewData["Title"] = "Contact";
+}
+
+<section class="auth-panel">
+    <div class="eyebrow mb-2">Contact Carevionix</div>
+    <h1 class="page-title h3 mb-3">Send a message to the platform team</h1>
+    <form asp-action="Contact" method="post" class="vstack gap-3">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+        </div>
+        <div>
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+        </div>
+        <div>
+            <label asp-for="Subject" class="form-label"></label>
+            <input asp-for="Subject" class="form-control" />
+            <span asp-validation-for="Subject" class="text-danger small"></span>
+        </div>
+        <div>
+            <label asp-for="Message" class="form-label"></label>
+            <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Message" class="text-danger small"></span>
+        </div>
+        <button class="btn btn-primary" type="submit">Submit message</button>
+    </form>
+</section>
+
+<section class="section-panel mt-4">
+    <h2 class="h5 page-title">Email configuration required</h2>
+    <p class="text-muted-strong mb-0">Configure the <code>Smtp</code> section in <code>appsettings.json</code>. For Gmail SMTP, use host <code>smtp.gmail.com</code>, port <code>587</code>, SSL enabled, your Gmail address as <code>UserName</code>, and a Gmail App Password as <code>Password</code>. Gmail App Passwords require 2-Step Verification to be enabled on the Google account.</p>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

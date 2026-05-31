@@ -1,0 +1,28 @@
+@model IReadOnlyList<Prescription>
+@{
+    ViewData["Title"] = "Prescriptions";
+}
+
+<section class="table-card">
+    <div class="p-3 border-bottom"><h1 class="h4 mb-0">Prescriptions</h1></div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Date</th><th>Diagnosis</th><th>Medicines</th><th>Follow up</th></tr></thead>
+            <tbody>
+            @foreach (var prescription in Model)
+            {
+                <tr>
+                    <td>@prescription.CreatedAt.ToLocalTime().ToString("g")</td>
+                    <td>@prescription.Diagnosis</td>
+                    <td>@string.Join(", ", prescription.Medicines.Select(m => $"{m.MedicineName} {m.Dose}"))</td>
+                    <td>@prescription.FollowUpDate?.ToString("d")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No prescriptions yet.</div>
+        }
+    </div>
+</section>

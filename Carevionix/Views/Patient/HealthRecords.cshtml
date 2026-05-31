@@ -1,0 +1,57 @@
+@model IReadOnlyList<HealthRecord>
+@using Carevionix.Models
+@{
+    ViewData["Title"] = "Health Records";
+    var doctors = ViewBag.Doctors as IReadOnlyList<Doctor> ?? [];
+}
+
+<section class="section-panel has-medical-art mb-4">
+    <h1 class="page-title h3 mb-3">Upload health record</h1>
+    <form asp-action="UploadRecord" method="post" enctype="multipart/form-data" class="row g-3">
+        @Html.AntiForgeryToken()
+        <div class="col-md-3"><select name="type" class="form-select" asp-items="Html.GetEnumSelectList<HealthRecordType>()"></select></div>
+        <div class="col-md-3"><input name="title" class="form-control" placeholder="Record title" /></div>
+        <div class="col-md-4"><input name="file" class="form-control" type="file" /></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Upload</button></div>
+        <div class="col-12"><input name="description" class="form-control" placeholder="Description" /></div>
+    </form>
+</section>
+
+<section class="table-card">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Title</th><th>Type</th><th>Uploaded</th><th>File</th><th>Consent sharing</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var record in Model)
+            {
+                <tr>
+                    <td>@record.Title</td>
+                    <td>@record.RecordType</td>
+                    <td>@record.UploadedAt.ToLocalTime().ToString("g")</td>
+                    <td>@record.FileName</td>
+                    <td>
+                        <form asp-action="ShareRecord" method="post" class="d-flex flex-wrap gap-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="RecordId" value="@record.Id" />
+                            <select name="DoctorUserId" class="form-select form-select-sm" style="max-width: 220px">
+                                <option value="">Select doctor</option>
+                                @foreach (var doctor in doctors)
+                                {
+                                    <option value="@doctor.UserId">@doctor.User.FullName</option>
+                                }
+                            </select>
+                            <input name="ExpiresAt" class="form-control form-control-sm" type="date" style="max-width: 160px" />
+                            <button class="btn btn-sm btn-outline-primary" type="submit">Share</button>
+                        </form>
+                    </td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-dark" asp-action="DownloadRecord" asp-route-id="@record.Id">Download</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No records uploaded yet.</div>
+        }
+    </div>
+</section>

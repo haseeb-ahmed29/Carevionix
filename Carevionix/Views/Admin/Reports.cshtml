@@ -1,0 +1,19 @@
+@model IReadOnlyList<ReportRowViewModel>
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<section class="table-card">
+    <div class="p-3 border-bottom"><h1 class="h4 mb-0">Appointment status report</h1></div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Status</th><th>Count</th></tr></thead>
+            <tbody>
+            @foreach (var row in Model)
+            {
+                <tr><td>@row.Label</td><td>@row.Count</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

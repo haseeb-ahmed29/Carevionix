@@ -1,0 +1,38 @@
+@model IReadOnlyList<Notification>
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<section class="table-card">
+    <div class="p-3 border-bottom"><h1 class="h4 mb-0">Notifications</h1></div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Status</th><th>Type</th><th>Message</th><th>Created</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var notification in Model)
+            {
+                <tr>
+                    <td><span class="badge @(notification.IsRead ? "badge-soft" : "badge-warn")">@(notification.IsRead ? "Read" : "Unread")</span></td>
+                    <td>@notification.Type</td>
+                    <td><strong>@notification.Title</strong><br /><span class="text-muted-strong">@notification.Message</span></td>
+                    <td>@notification.CreatedAt.ToLocalTime().ToString("g")</td>
+                    <td>
+                        @if (!notification.IsRead)
+                        {
+                            <form asp-action="MarkNotificationRead" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@notification.Id" />
+                                <button class="btn btn-sm btn-outline-dark" type="submit">Mark read</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No notifications yet.</div>
+        }
+    </div>
+</section>

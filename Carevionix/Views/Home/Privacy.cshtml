@@ -1,0 +1,156 @@
+@{
+    ViewData["Title"] = "Privacy Policy";
+
+    var dataItems = new[] {
+        "Account details such as name, email, phone number, role, and profile information.",
+        "Appointment, consultation, prescription, invoice, notification, and chat information created while using Carevionix.",
+        "Uploaded health records, reports, images, and document metadata shared by patients.",
+        "Technical details such as browser type, device information, session activity, and security logs."
+    };
+
+    var useItems = new[] {
+        "To create and manage patient, doctor, and admin accounts.",
+        "To schedule appointments, support online consultations, and maintain care history.",
+        "To help doctors review shared medical records, write prescriptions, and manage follow-up care.",
+        "To send service notifications, reminders, invoices, and important account updates.",
+        "To monitor platform reliability, prevent abuse, improve security, and support admin operations."
+    };
+
+    var rights = new[] {
+        "Review and update your profile information.",
+        "Upload, manage, or remove health records where platform rules allow.",
+        "Control which doctors can access shared medical records.",
+        "Request help with account access, privacy concerns, or data corrections."
+    };
+}
+
+<section class="section-panel content-stack">
+    <div class="stack-sm">
+        <div class="eyebrow">Carevionix privacy</div>
+        <h1 class="page-title">Privacy Policy</h1>
+        <p class="text-muted-strong mb-0">
+            Carevionix is designed to keep healthcare workflows organized while protecting patient, doctor, and platform data with clear access controls.
+        </p>
+        <p class="type-caption mb-0">Last updated: May 31, 2026</p>
+    </div>
+</section>
+
+<section class="responsive-grid mt-4" aria-label="Carevionix privacy summary">
+    <article class="premium-card stack-sm">
+        <span class="tile-icon"><i data-lucide="database" aria-hidden="true"></i></span>
+        <h2 class="type-card mb-0">Data we collect</h2>
+        <p class="type-caption mb-0">We collect only the information needed to operate accounts, appointments, records, consultations, prescriptions, invoices, and support features.</p>
+    </article>
+    <article class="premium-card stack-sm">
+        <span class="tile-icon"><i data-lucide="shield-check" aria-hidden="true"></i></span>
+        <h2 class="type-card mb-0">How we protect it</h2>
+        <p class="type-caption mb-0">Access is role-based, so patients, doctors, and admins only see the information required for their responsibilities.</p>
+    </article>
+    <article class="premium-card stack-sm">
+        <span class="tile-icon"><i data-lucide="user-check" aria-hidden="true"></i></span>
+        <h2 class="type-card mb-0">Your control</h2>
+        <p class="type-caption mb-0">Patients can manage profile details, uploaded records, and sharing permissions for their care journey.</p>
+    </article>
+</section>
+
+<section class="section-panel content-stack mt-4">
+    <div class="stack-sm">
+        <h2>Information We Collect</h2>
+        <p class="text-muted-strong mb-0">
+            Depending on how you use Carevionix, we may collect the following categories of information:
+        </p>
+    </div>
+    <div class="about-check-list">
+        @foreach (var item in dataItems)
+        {
+            <span><i data-lucide="check" aria-hidden="true"></i>@item</span>
+        }
+    </div>
+</section>
+
+<section class="section-panel content-stack mt-4">
+    <div class="stack-sm">
+        <h2>How We Use Information</h2>
+        <p class="text-muted-strong mb-0">
+            Carevionix uses platform information to provide secure and reliable healthcare services.
+        </p>
+    </div>
+    <div class="about-check-list">
+        @foreach (var item in useItems)
+        {
+            <span><i data-lucide="check" aria-hidden="true"></i>@item</span>
+        }
+    </div>
+</section>
+
+<section class="responsive-grid mt-4">
+    <article class="premium-card stack-md">
+        <span class="tile-icon"><i data-lucide="lock-keyhole" aria-hidden="true"></i></span>
+        <div class="stack-sm">
+            <h2 class="type-card mb-0">Medical Record Access</h2>
+            <p class="type-caption mb-0">
+                Uploaded health records are available to the patient, authorized doctors, and approved admin workflows. Doctors can view records shared for consultation and care support.
+            </p>
+        </div>
+    </article>
+    <article class="premium-card stack-md">
+        <span class="tile-icon"><i data-lucide="users" aria-hidden="true"></i></span>
+        <div class="stack-sm">
+            <h2 class="type-card mb-0">Information Sharing</h2>
+            <p class="type-caption mb-0">
+                We do not sell personal or medical information. Data may be shared only when needed for care delivery, platform administration, legal compliance, or user-requested support.
+            </p>
+        </div>
+    </article>
+    <article class="premium-card stack-md">
+        <span class="tile-icon"><i data-lucide="cookie" aria-hidden="true"></i></span>
+        <div class="stack-sm">
+            <h2 class="type-card mb-0">Cookies and Sessions</h2>
+            <p class="type-caption mb-0">
+                Carevionix may use cookies or session storage to keep users signed in, protect accounts, remember preferences, and support basic analytics or security checks.
+            </p>
+        </div>
+    </article>
+    <article class="premium-card stack-md">
+        <span class="tile-icon"><i data-lucide="archive" aria-hidden="true"></i></span>
+        <div class="stack-sm">
+            <h2 class="type-card mb-0">Data Retention</h2>
+            <p class="type-caption mb-0">
+                We keep records for as long as needed to provide services, maintain care history, meet operational requirements, resolve disputes, or comply with applicable obligations.
+            </p>
+        </div>
+    </article>
+</section>
+
+<section class="section-panel content-stack mt-4">
+    <div class="stack-sm">
+        <h2>Your Privacy Choices</h2>
+        <p class="text-muted-strong mb-0">
+            Carevionix gives users practical control over their account and care information.
+        </p>
+    </div>
+    <div class="about-check-list">
+        @foreach (var item in rights)
+        {
+            <span><i data-lucide="check" aria-hidden="true"></i>@item</span>
+        }
+    </div>
+</section>
+
+<section class="section-panel content-stack mt-4">
+    <div class="stack-sm">
+        <h2>Security</h2>
+        <p class="text-muted-strong mb-0">
+            Carevionix stores consultation, prescription, invoice, notification, chat, and uploaded health record metadata in SQL Server with role-based access controls. We use administrative safeguards and platform-level checks to reduce unauthorized access and protect sensitive healthcare information.
+        </p>
+    </div>
+    <div class="stack-sm">
+        <h2>Contact Us</h2>
+        <p class="text-muted-strong mb-0">
+            For privacy questions, account support, or data-related requests, please contact the Carevionix support team through the Contact page.
+        </p>
+        <a class="btn btn-primary app-btn" asp-controller="Home" asp-action="Contact">
+            <i class="btn-icon" data-lucide="mail" aria-hidden="true"></i>Contact support
+        </a>
+    </div>
+</section>

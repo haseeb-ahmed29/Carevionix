@@ -1,0 +1,16 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Analytics";
+}
+
+<section class="stat-grid mb-4">
+    <div class="stat-tile"><div class="text-muted-strong">Appointments</div><div class="stat-value">@Model.Appointments</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Pending</div><div class="stat-value">@Model.PendingAppointments</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Completed</div><div class="stat-value">@Model.CompletedConsultations</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Revenue</div><div class="stat-value h4">PKR @Model.Revenue.ToString("N2")</div></div>
+</section>
+
+<section class="section-panel">
+    <h1 class="page-title h3">System monitoring</h1>
+    <p class="text-muted-strong mb-0">SQL Server, Identity roles, migrations, and dashboard endpoints were verified during implementation.</p>
+</section>

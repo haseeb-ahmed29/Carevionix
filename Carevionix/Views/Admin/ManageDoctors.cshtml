@@ -1,0 +1,100 @@
+@model AdminUsersViewModel<Doctor>
+@{
+    ViewData["Title"] = "Manage Doctors";
+}
+
+<section class="section-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3">
+        <div>
+            <div class="eyebrow mb-2">Admin control</div>
+            <h1 class="page-title h4 mb-1">Add doctor</h1>
+            <p class="text-muted-strong mb-0">Create doctor accounts and clinical profiles.</p>
+        </div>
+    </div>
+    <form asp-action="SaveDoctor" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <div class="col-md-3"><input name="FullName" class="form-control" placeholder="Full name" required /></div>
+        <div class="col-md-3"><input name="Email" class="form-control" type="email" placeholder="Email" required /></div>
+        <div class="col-md-2"><input name="Password" class="form-control" placeholder="Password" /></div>
+        <div class="col-md-2"><input name="Specialty" class="form-control" placeholder="Specialty" required /></div>
+        <div class="col-md-2"><input name="ConsultationFee" class="form-control" type="number" min="0" step="0.01" placeholder="Fee" /></div>
+        <div class="col-md-3"><input name="PhoneNumber" class="form-control" placeholder="Phone" /></div>
+        <div class="col-md-3"><input name="Location" class="form-control" placeholder="Location" /></div>
+        <div class="col-md-3"><input name="Languages" class="form-control" placeholder="Languages" /></div>
+        <div class="col-md-2"><input name="ExperienceYears" class="form-control" type="number" min="0" placeholder="Experience" /></div>
+        <div class="col-md-1">
+            <select name="IsActive" class="form-select"><option value="true">Active</option><option value="false">Inactive</option></select>
+        </div>
+        <div class="col-md-6"><input name="Qualifications" class="form-control" placeholder="Qualifications" /></div>
+        <div class="col-md-6"><input name="Bio" class="form-control" placeholder="Profile bio" /></div>
+        <div class="col-12"><button class="btn btn-primary" type="submit">Add doctor</button></div>
+    </form>
+</section>
+
+<section class="table-card">
+    <div class="table-card-header">
+        <div>
+            <h1>Doctors</h1>
+            <p class="text-muted-strong mb-0">Edit account details, status, specialty, fee, and profile data.</p>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle admin-edit-table">
+            <thead><tr><th>Doctor</th><th>Account</th><th>Clinical details</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            @foreach (var doctor in Model.Items)
+            {
+                var editFormId = $"doctor-edit-{doctor.Id}";
+                <tr>
+                    <td><span class="avatar-pill"><img src="@(doctor.User.ProfileImagePath ?? Url.Content("~/Images/Home Page hero image.jpg"))" alt="" /><span>@doctor.User.FullName</span></span></td>
+                    <td>
+                        <div class="admin-inline-form">
+                            <input form="@editFormId" type="hidden" name="Id" value="@doctor.Id" />
+                            <input form="@editFormId" name="FullName" class="form-control form-control-sm" value="@doctor.User.FullName" />
+                            <input form="@editFormId" name="Email" class="form-control form-control-sm" type="email" value="@doctor.User.Email" />
+                            <input form="@editFormId" name="PhoneNumber" class="form-control form-control-sm" value="@doctor.User.PhoneNumber" placeholder="Phone" />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="admin-inline-form">
+                            <input form="@editFormId" name="Specialty" class="form-control form-control-sm" value="@doctor.Specialty" />
+                            <input form="@editFormId" name="Location" class="form-control form-control-sm" value="@doctor.Location" placeholder="Location" />
+                            <input form="@editFormId" name="Languages" class="form-control form-control-sm" value="@doctor.Languages" placeholder="Languages" />
+                            <input form="@editFormId" name="ExperienceYears" class="form-control form-control-sm" type="number" min="0" value="@doctor.ExperienceYears" />
+                            <input form="@editFormId" name="ConsultationFee" class="form-control form-control-sm" type="number" min="0" step="0.01" value="@doctor.ConsultationFee" />
+                            <input form="@editFormId" name="Qualifications" class="form-control form-control-sm" value="@doctor.Qualifications" placeholder="Qualifications" />
+                            <input form="@editFormId" name="Bio" class="form-control form-control-sm" value="@doctor.Bio" placeholder="Bio" />
+                        </div>
+                    </td>
+                    <td>
+                            <select form="@editFormId" name="IsActive" class="form-select form-select-sm">
+                                @if (doctor.IsActive)
+                                {
+                                    <option value="true" selected>Active</option>
+                                    <option value="false">Inactive</option>
+                                }
+                                else
+                                {
+                                    <option value="true">Active</option>
+                                    <option value="false" selected>Inactive</option>
+                                }
+                            </select>
+                            <span class="badge @(doctor.IsActive ? "badge-soft" : "badge-warn") mt-2">@(doctor.IsActive ? "Active" : "Inactive")</span>
+                    </td>
+                    <td class="admin-action-stack">
+                        <form id="@editFormId" asp-action="SaveDoctor" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                        </form>
+                        <form asp-action="DeleteDoctor" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@doctor.Id" />
+                            <button class="btn btn-sm btn-outline-dark" type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

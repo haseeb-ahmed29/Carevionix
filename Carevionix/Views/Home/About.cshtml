@@ -1,0 +1,108 @@
+@{
+    ViewData["Title"] = "About Us";
+
+    var trustStats = new[] {
+        new { Value = "3", Label = "Dedicated portals" },
+        new { Value = "24/7", Label = "Digital access" },
+        new { Value = "1", Label = "Connected care record" }
+    };
+
+    var strengths = new[] {
+        new { Title = "Secure health records", Text = "Patients can upload reports, prescriptions, and history while deciding what doctors can review.", Icon = "folder-lock" },
+        new { Title = "Doctor-led consultations", Text = "Doctors receive useful context before the visit, complete video sessions, and write prescriptions in the same flow.", Icon = "stethoscope" },
+        new { Title = "Admin oversight", Text = "Admins manage doctors, patients, appointments, health records, analytics, and platform control from one workspace.", Icon = "shield-check" }
+    };
+
+    var journeySteps = new[] {
+        new { Step = "01", Title = "Find care", Text = "Search doctors by specialty, availability, location, language, and rating." },
+        new { Step = "02", Title = "Book safely", Text = "Request appointments that respect doctor schedules and reduce timing conflicts." },
+        new { Step = "03", Title = "Consult online", Text = "Join focused video rooms with medical records close at hand." },
+        new { Step = "04", Title = "Follow up", Text = "Keep prescriptions, invoices, reminders, and consultation history organized." }
+    };
+}
+
+<section class="about-hero">
+    <div class="about-hero-copy">
+        <div class="eyebrow">About Carevionix</div>
+        <h1>Healthcare panels that feel calm, connected, and easy to trust.</h1>
+        <p>Carevionix brings patients, doctors, and admins into one polished digital healthcare system. The platform is built around real care workflows: booking, records, video consultation, prescriptions, invoices, reminders, and platform control.</p>
+        <div class="about-hero-actions">
+            <a class="btn btn-primary app-btn" asp-controller="Account" asp-action="RegisterPatient">
+                <i class="btn-icon" data-lucide="user-plus" aria-hidden="true"></i>Get started
+            </a>
+            <a class="btn btn-outline-primary app-btn" asp-controller="Home" asp-action="Services">
+                <i class="btn-icon" data-lucide="heart-pulse" aria-hidden="true"></i>View services
+            </a>
+        </div>
+    </div>
+    <div class="about-hero-visual" aria-label="Carevionix healthcare preview">
+        <img class="about-care-photo" src="~/Images/Home page Crad image 3.jpg" alt="Carevionix digital healthcare coordination" />
+        <article class="about-visual-card about-visual-card-top">
+            <span><i data-lucide="calendar-check" aria-hidden="true"></i></span>
+            <div>
+                <strong>Easy booking</strong>
+                <small>Appointments stay organized</small>
+            </div>
+        </article>
+        <article class="about-visual-card about-visual-card-bottom">
+            <span><i data-lucide="video" aria-hidden="true"></i></span>
+            <div>
+                <strong>Online consults</strong>
+                <small>Records, prescriptions, and follow-up</small>
+            </div>
+        </article>
+    </div>
+</section>
+
+<section class="about-stats" aria-label="Carevionix platform highlights">
+    @foreach (var stat in trustStats)
+    {
+        <div>
+            <strong>@stat.Value</strong>
+            <span>@stat.Label</span>
+        </div>
+    }
+</section>
+
+<section class="about-split">
+    <div>
+        <div class="eyebrow">What we solve</div>
+        <h2>Less scattered medical data. More clarity at every step.</h2>
+        <p>Traditional care journeys often split appointments, reports, prescriptions, and communication across different places. Carevionix keeps the important pieces together so patients can prepare, doctors can make faster decisions, and admins can keep the system reliable.</p>
+    </div>
+    <div class="about-check-list">
+        <span><i data-lucide="check" aria-hidden="true"></i>Role-based dashboards for Patients, Doctors, and Admins</span>
+        <span><i data-lucide="check" aria-hidden="true"></i>Health record sharing with consent-focused access</span>
+        <span><i data-lucide="check" aria-hidden="true"></i>Video calls, prescriptions, invoices, and reminders in one flow</span>
+        <span><i data-lucide="check" aria-hidden="true"></i>Analytics and system control for platform confidence</span>
+    </div>
+</section>
+
+<section class="about-card-grid">
+    @foreach (var item in strengths)
+    {
+        <article class="about-card">
+            <span class="about-icon"><i data-lucide="@item.Icon" aria-hidden="true"></i></span>
+            <h2>@item.Title</h2>
+            <p>@item.Text</p>
+        </article>
+    }
+</section>
+
+<section class="about-journey">
+    <div class="about-journey-heading">
+        <div class="eyebrow">Care journey</div>
+        <h2>Designed for the full appointment lifecycle.</h2>
+        <p>Every action has a place, from first search to follow-up records.</p>
+    </div>
+    <div class="about-steps">
+        @foreach (var step in journeySteps)
+        {
+            <article>
+                <span>@step.Step</span>
+                <h3>@step.Title</h3>
+                <p>@step.Text</p>
+            </article>
+        }
+    </div>
+</section>

@@ -1,0 +1,48 @@
+@model FindDoctorsViewModel
+@{
+    ViewData["Title"] = "Find Doctors";
+}
+
+<section class="section-panel has-medical-art doctor-auth mb-4">
+    <h1 class="page-title h3 mb-3">Find doctors</h1>
+    <form method="get" class="row g-3">
+        <div class="col-md-3"><input name="Specialty" value="@Model.Filter.Specialty" class="form-control" placeholder="Specialty" /></div>
+        <div class="col-md-3"><input name="Location" value="@Model.Filter.Location" class="form-control" placeholder="Location" /></div>
+        <div class="col-md-3"><input name="Language" value="@Model.Filter.Language" class="form-control" placeholder="Language" /></div>
+        <div class="col-md-2"><input name="Availability" value="@Model.Filter.Availability" class="form-control" placeholder="Availability date/time" /></div>
+        <div class="col-md-1"><input name="MinRating" value="@Model.Filter.MinRating" class="form-control" placeholder="Rating" /></div>
+        <div class="col-12"><button class="btn btn-primary" type="submit">Search</button></div>
+    </form>
+</section>
+
+<section class="table-card">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Doctor</th><th>Specialty</th><th>Location</th><th>Languages</th><th>Rating</th><th>Fee</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var doctor in Model.Doctors)
+            {
+                <tr>
+                    <td><span class="avatar-pill"><img src="@(doctor.User.ProfileImagePath ?? Url.Content("~/Images/Home Page hero image.jpg"))" alt="" /><span>@doctor.User.FullName</span></span></td>
+                    <td>@doctor.Specialty</td>
+                    <td>@doctor.Location</td>
+                    <td>@doctor.Languages</td>
+                    <td>
+                        @{
+                            var reviewCount = doctor.Reviews.Count;
+                            var rating = reviewCount > 0 ? doctor.Reviews.Average(r => r.Rating) : 0;
+                        }
+                        @(reviewCount > 0 ? $"{rating:0.0}/5 ({reviewCount})" : "New")
+                    </td>
+                    <td>PKR @doctor.ConsultationFee.ToString("N2")</td>
+                    <td class="text-end"><a class="btn btn-sm btn-primary" asp-action="BookAppointment" asp-route-doctorId="@doctor.Id">Book</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Doctors.Any())
+        {
+            <div class="empty-state">No active doctors match the selected filters.</div>
+        }
+    </div>
+</section>

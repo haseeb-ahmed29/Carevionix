@@ -1,0 +1,65 @@
+@model IReadOnlyList<Appointment>
+@{
+    ViewData["Title"] = "Video Calls";
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <div class="eyebrow mb-2">Consultation rooms</div>
+            <h1 class="page-title h3 mb-1">Video calls</h1>
+            <p class="text-muted-strong mb-0">Start patient consultations with camera, audio, and screen sharing.</p>
+        </div>
+        <a class="btn btn-outline-primary" asp-action="Appointments">Back to appointments</a>
+    </div>
+</section>
+
+<section class="table-card">
+    <div class="table-card-header">
+        <h2>Scheduled rooms</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Date</th><th>Patient</th><th>Type</th><th>Status</th><th>Reason</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var appointment in Model)
+            {
+                var canJoin = appointment.Status == AppointmentStatus.Accepted && appointment.ConsultationType == ConsultationType.Video;
+                <tr>
+                    <td>@appointment.ScheduledAt.ToString("g")</td>
+                    <td>@appointment.Patient?.User?.FullName</td>
+                    <td>@appointment.ConsultationType</td>
+                    <td><span class="badge badge-soft">@appointment.Status</span></td>
+                    <td>@appointment.Reason</td>
+                    <td class="text-end">
+                        @if (canJoin)
+                        {
+                            <form asp-controller="Doctor" asp-action="VideoConsultation" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="appointmentId" value="@appointment.Id" />
+                                <button class="btn btn-sm btn-primary" type="submit">Open Room</button>
+                            </form>
+                        }
+                        else if (appointment.Status == AppointmentStatus.Accepted)
+                        {
+                            <span class="status-badge is-active">Accepted</span>
+                        }
+                        else if (appointment.Status == AppointmentStatus.Rejected)
+                        {
+                            <span class="status-badge is-pending">Rejected</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted-strong small">Accept video appointment first</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No consultations are scheduled yet.</div>
+        }
+    </div>
+</section>

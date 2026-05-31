@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Our Services";
+
+    var services = new[] {
+        new { Step = "01", Title = "Doctor Discovery", Desc = "Find the right doctor by specialty, rating, language, location, and available time.", Icon = "search" },
+        new { Step = "02", Title = "Smart Appointments", Desc = "Request, manage, and track visits with scheduling that keeps care organized.", Icon = "calendar-check" },
+        new { Step = "03", Title = "Digital Records", Desc = "Keep reports, prescriptions, and medical history in one clean patient record.", Icon = "file-heart" },
+        new { Step = "04", Title = "Live Consultations", Desc = "Join focused video rooms where doctors can review records during the visit.", Icon = "video" },
+        new { Step = "05", Title = "E-Prescriptions", Desc = "Doctors can record medicines, notes, outcomes, and follow-up instructions.", Icon = "clipboard-pen-line" },
+        new { Step = "06", Title = "Admin Operations", Desc = "Admins can manage users, appointments, records, analytics, and platform control.", Icon = "shield-check" }
+    };
+
+    var highlights = new[] {
+        "Connected patient, doctor, and admin panels",
+        "Records, invoices, reminders, and consultations together",
+        "Clean workflows for daily healthcare operations"
+    };
+}
+
+<section class="services-modern-hero">
+    <div class="services-hero-copy">
+        <div class="eyebrow">Carevionix Platform</div>
+        <h1>Modern digital healthcare services, kept simple.</h1>
+        <p>Carevionix connects booking, records, online visits, prescriptions, invoices, reminders, and admin control into one polished healthcare workflow.</p>
+    </div>
+    <div class="services-hero-panel" aria-label="Carevionix service highlights">
+        @foreach (var highlight in highlights)
+        {
+            <span><i data-lucide="check" aria-hidden="true"></i>@highlight</span>
+        }
+    </div>
+</section>
+
+<section class="services-modern-grid" aria-label="Carevionix services">
+    @foreach (var service in services)
+    {
+        <article class="services-modern-card">
+            <div class="services-card-top">
+                <span class="services-icon"><i data-lucide="@service.Icon" aria-hidden="true"></i></span>
+                <small>@service.Step</small>
+            </div>
+            <h2>@service.Title</h2>
+            <p>@service.Desc</p>
+        </article>
+    }
+</section>
+
+<section class="services-modern-strip">
+    <div>
+        <div class="eyebrow">Why Carevionix</div>
+        <h2>Healthcare feels better when every step has a clear place.</h2>
+        <p>Instead of scattered tools, Carevionix keeps the full journey connected so patients can prepare, doctors can consult with context, and admins can keep the platform steady.</p>
+    </div>
+    <a asp-controller="Account" asp-action="RegisterPatient" class="btn btn-primary app-btn">
+        <i class="btn-icon" data-lucide="user-plus" aria-hidden="true"></i>Explore platform
+    </a>
+</section>

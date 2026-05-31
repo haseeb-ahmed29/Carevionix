@@ -1,0 +1,135 @@
+@model IReadOnlyList<Invoice>
+@{
+    ViewData["Title"] = "Invoices";
+    var demoPaidInvoiceId = ViewBag.DemoPaidInvoiceId as int?;
+    var demoPaymentReceipt = ViewBag.DemoPaymentReceipt as string;
+}
+
+<section class="table-card">
+    <div class="table-card-header">
+        <div>
+            <h1>Invoices</h1>
+            <p class="text-muted-strong mb-0">Review consultation bills and run a demo payment without a real gateway.</p>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(demoPaymentReceipt))
+        {
+            <span class="badge-soft">Receipt @demoPaymentReceipt</span>
+        }
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Date</th><th>Fee</th><th>Insurance</th><th>Discount</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            @foreach (var invoice in Model)
+            {
+                var isDemoPaid = demoPaidInvoiceId == invoice.Id;
+                var invoiceTotalLabel = $"PKR {invoice.Total:N2}";
+                var canPay = invoice.Total > 0 && invoice.PaymentStatus == PaymentStatus.Unpaid;
+                <tr>
+                    <td>@invoice.GeneratedAt.ToLocalTime().ToString("g")</td>
+                    <td>PKR @invoice.ConsultationFee.ToString("N2")</td>
+                    <td>PKR @invoice.InsuranceAmount.ToString("N2")</td>
+                    <td>PKR @invoice.Discount.ToString("N2")</td>
+                    <td><strong>PKR @invoice.Total.ToString("N2")</strong></td>
+                    <td>
+                        @if (invoice.PaymentStatus == PaymentStatus.Approved)
+                        {
+                            <span class="status-badge is-active">Paid</span>
+                        }
+                        else if (invoice.PaymentStatus == PaymentStatus.Submitted || isDemoPaid)
+                        {
+                            <span class="badge-warn">Sent to admin</span>
+                        }
+                        else if (invoice.Total <= 0)
+                        {
+                            <span class="badge-soft">Settled</span>
+                        }
+                        else
+                        {
+                            <span class="badge-warn">Unpaid</span>
+                        }
+                    </td>
+                    <td>
+                        @if (canPay)
+                        {
+                            <button type="button"
+                                    class="btn btn-primary btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#demoPaymentModal"
+                                    data-invoice-id="@invoice.Id"
+                                    data-invoice-total="@invoiceTotalLabel">
+                                <i class="btn-icon" data-lucide="credit-card" aria-hidden="true"></i>Pay demo
+                            </button>
+                        }
+                        else if (invoice.PaymentStatus == PaymentStatus.Submitted)
+                        {
+                            <span class="text-muted">Waiting admin approval</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No action</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No invoices generated yet.</div>
+        }
+    </div>
+</section>
+
+<div class="modal fade" id="demoPaymentModal" tabindex="-1" aria-labelledby="demoPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="PayInvoiceDemo" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="InvoiceId" id="demoInvoiceId" />
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="demoPaymentModalLabel">Demo payment</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3">
+                        Demo only. No real card, wallet, bank, or gateway will be charged.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="demoInvoiceTotal">Amount</label>
+                        <input class="form-control" id="demoInvoiceTotal" value="" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="demoPayerName">Payer name</label>
+                        <input class="form-control" id="demoPayerName" name="PayerName" maxlength="80" required />
+                    </div>
+                    <div>
+                        <label class="form-label" for="demoMethod">Demo method</label>
+                        <select class="form-select" id="demoMethod" name="DemoMethod" required>
+                            <option value="Demo Card">Demo Card</option>
+                            <option value="Demo Wallet">Demo Wallet</option>
+                            <option value="Demo Bank Transfer">Demo Bank Transfer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="btn-icon" data-lucide="check-circle-2" aria-hidden="true"></i>Confirm demo payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const demoPaymentModal = document.getElementById('demoPaymentModal');
+        demoPaymentModal?.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            document.getElementById('demoInvoiceId').value = button?.getAttribute('data-invoice-id') ?? '';
+            document.getElementById('demoInvoiceTotal').value = button?.getAttribute('data-invoice-total') ?? '';
+        });
+    </script>
+}

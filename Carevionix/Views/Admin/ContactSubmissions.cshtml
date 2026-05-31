@@ -1,0 +1,42 @@
+@model IReadOnlyList<ContactSubmission>
+@{
+    ViewData["Title"] = "Contact Submissions";
+}
+
+<section class="table-card">
+    <div class="table-card-header">
+        <div>
+            <h1>Contact submissions</h1>
+            <p class="text-muted-strong mb-0">Messages sent from the public contact form.</p>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Sender</th><th>Subject</th><th>Message</th><th>Submitted</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.Name</strong><br /><span class="text-muted-strong small">@item.Email</span><br /><span class="text-muted-strong small">@item.PhoneNumber</span></td>
+                    <td>@item.Subject</td>
+                    <td>@item.Message</td>
+                    <td>@item.SubmittedAt.ToLocalTime().ToString("g")</td>
+                    <td><span class="badge @(item.IsResolved ? "badge-soft" : "badge-warn")">@(item.IsResolved ? "Resolved" : "Open")</span></td>
+                    <td>
+                        <form asp-action="ResolveContactSubmission" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="hidden" name="isResolved" value="@(!item.IsResolved)" />
+                            <button class="btn btn-sm btn-outline-primary" type="submit">@(item.IsResolved ? "Reopen" : "Resolve")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No contact submissions yet.</div>
+        }
+    </div>
+</section>

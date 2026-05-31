@@ -1,0 +1,42 @@
+@model IReadOnlyList<HealthRecordShare>
+@{
+    ViewData["Title"] = "Shared Records";
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <div class="eyebrow mb-2">Consent-based access</div>
+            <h1 class="page-title h3 mb-1">Shared health records</h1>
+            <p class="text-muted-strong mb-0">Patient files shared for consultation review.</p>
+        </div>
+        <a class="btn btn-outline-primary" asp-action="Appointments">Back to appointments</a>
+    </div>
+</section>
+
+<section class="table-card">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Patient</th><th>Record</th><th>Type</th><th>Shared</th><th>Expires</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var share in Model)
+            {
+                <tr>
+                    <td>@share.Patient?.User?.FullName</td>
+                    <td>@share.HealthRecord?.Title</td>
+                    <td>@share.HealthRecord?.RecordType</td>
+                    <td>@share.SharedAt.ToLocalTime().ToString("g")</td>
+                    <td>@(share.ExpiresAt?.ToLocalTime().ToString("d") ?? "No expiry")</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="DownloadSharedRecord" asp-route-shareId="@share.Id">Download</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No records have been shared with you yet.</div>
+        }
+    </div>
+</section>

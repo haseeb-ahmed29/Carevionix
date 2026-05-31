@@ -1,0 +1,77 @@
+@model HomeIndexViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="carevionix-hero mb-4">
+    <div class="hero-image-slider" aria-label="Carevionix healthcare image showcase">
+        <img class="hero-slide is-active" src="~/Images/slide-img-1.png" alt="Professional healthcare consultation" aria-hidden="false" />
+        <img class="hero-slide" src="~/Images/slide-img-2.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        <img class="hero-slide" src="~/Images/slide-img-3.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        <img class="hero-slide" src="~/Images/slide-img-4.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        <img class="hero-slide" src="~/Images/slide-img-5.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        <img class="hero-slide" src="~/Images/slide-img-6.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    </div>
+</section>
+
+<section class="public-care-lane mb-4">
+    <article>
+        <span>For patients</span>
+        <h2>Book care without confusion.</h2>
+        <p>Search doctors, upload health records, join video rooms, read prescriptions, and track reminders from a dedicated patient panel.</p>
+        <a asp-controller="Account" asp-action="RegisterPatient">Create patient account</a>
+    </article>
+    <article>
+        <span>For doctors</span>
+        <h2>Run consultations cleanly.</h2>
+        <p>Review requests, manage availability, access shared records, complete consultations, and create prescriptions in one workspace.</p>
+        <a asp-controller="Account" asp-action="AdminLogin">Admin manages doctors</a>
+    </article>
+</section>
+
+<section class="public-service-suite mb-4">
+    <div class="public-section-heading">
+        <div class="eyebrow mb-2">Platform suite</div>
+        <h2>Everything needed for online medical consultation.</h2>
+        <p>Carevionix connects booking, records, video visits, prescriptions, invoices, reminders, and AI screening into a calm end-to-end experience.</p>
+    </div>
+    <div class="feature-card-grid public-feature-grid">
+        <article><span>01</span><h2>Doctor discovery</h2><p>Filter doctors by specialty, language, location, rating, and availability.</p></article>
+        <article><span>02</span><h2>Smart booking</h2><p>Appointment requests respect doctor schedules and avoid time conflicts.</p></article>
+        <article><span>03</span><h2>Video rooms</h2><p>Accepted appointments open a focused consultation room for both sides.</p></article>
+        <article><span>04</span><h2>Health records</h2><p>Patients upload reports and share them with consent for better review.</p></article>
+        <article><span>05</span><h2>Prescriptions</h2><p>Doctors record medicines, notes, consultation outcomes, and follow-ups.</p></article>
+        <article><span>06</span><h2>Invoices</h2><p>Consultation bills are generated clearly without payment gateway complexity.</p></article>
+    </div>
+</section>
+
+<section class="public-journey-panel mb-4">
+    <div class="public-journey-copy">
+        <div class="eyebrow mb-2">How care moves</div>
+        <h2>From symptoms to follow-up, without scattered tabs.</h2>
+        <p>Patients and doctors work through one connected flow, so every appointment has the context it needs.</p>
+    </div>
+    <div class="flow-steps">
+        <div><strong>Find</strong><span>Search specialists</span></div>
+        <div><strong>Book</strong><span>Select available time</span></div>
+        <div><strong>Consult</strong><span>Video, audio, or chat</span></div>
+        <div><strong>Follow up</strong><span>Prescriptions and reminders</span></div>
+    </div>
+</section>
+
+<section class="public-showcase mb-4">
+    <div>
+        <img src="~/Images/slide-img-6.png" alt="Carevionix care coordination" />
+    </div>
+    <div>
+        <div class="eyebrow mb-2">Why it feels better</div>
+        <h2>Clean panels, useful actions, and medical data where it belongs.</h2>
+        <p>Every panel is built for real workflows: patients can prepare before the visit, doctors can review quickly, and admins can keep the platform organized.</p>
+        <div class="public-mini-grid">
+            <span>Secure records</span>
+            <span>Role-based panels</span>
+            <span>Consultation history</span>
+            <span>Notifications</span>
+        </div>
+    </div>
+</section>

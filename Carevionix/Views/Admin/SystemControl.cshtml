@@ -1,0 +1,40 @@
+@model AdminSystemControlViewModel
+@{
+    ViewData["Title"] = "System Control";
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <div class="eyebrow mb-2">System control</div>
+            <h1 class="page-title h3 mb-1">Platform operations</h1>
+            <p class="text-muted-strong mb-0">Review access, appointment pressure, records, messages, revenue, and unresolved inquiries.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-primary" asp-action="ManageAppointments">Review Appointments</a>
+            <a class="btn btn-outline-dark" asp-action="ContactSubmissions">Contact Queue</a>
+        </div>
+    </div>
+</section>
+
+<section class="stat-grid mb-4">
+    <div class="stat-tile"><div class="text-muted-strong">Active doctors</div><div class="stat-value">@Model.ActiveDoctors</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Inactive doctors</div><div class="stat-value">@Model.InactiveDoctors</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Active patients</div><div class="stat-value">@Model.ActivePatients</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Inactive patients</div><div class="stat-value">@Model.InactivePatients</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Pending appointments</div><div class="stat-value">@Model.PendingAppointments</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Open contacts</div><div class="stat-value">@Model.OpenContactSubmissions</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Revenue</div><div class="stat-value h4">PKR @Model.Revenue.ToString("N2")</div></div>
+</section>
+
+<div class="quick-actions">
+    <a class="action-link" asp-action="ManageDoctors"><strong>Doctor access</strong><span>Approve, edit, deactivate, or remove doctor accounts</span></a>
+    <a class="action-link" asp-action="ManagePatients"><strong>Patient access</strong><span>Maintain patient profiles, status, and medical context</span></a>
+    <a class="action-link" asp-action="ManageHealthRecords"><strong>Health records</strong><span>Audit uploaded clinical files and downloads</span></a>
+    <a class="action-link" asp-action="Analytics"><strong>Analytics</strong><span>Revenue and consultation performance summary</span></a>
+</div>
+
+<section class="section-panel mt-4">
+    <h2 class="h5 page-title mb-2">Runtime status</h2>
+    <p class="text-muted-strong mb-0">Server UTC time: @Model.ServerTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")</p>
+</section>

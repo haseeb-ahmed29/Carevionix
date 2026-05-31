@@ -1,0 +1,114 @@
+@model IReadOnlyList<Appointment>
+@{
+    ViewData["Title"] = "Manage Appointments";
+
+    var newAppointments = Model
+        .Where(a => a.Status is AppointmentStatus.Pending or AppointmentStatus.Rescheduled)
+        .OrderByDescending(a => a.CreatedAt)
+        .ToList();
+    var approvedAppointments = Model.Where(a => a.Status == AppointmentStatus.Accepted).ToList();
+    var rejectedAppointments = Model.Where(a => a.Status == AppointmentStatus.Rejected).ToList();
+    var paymentReceivedAppointments = Model.Where(a => a.Invoice?.PaymentStatus == PaymentStatus.Approved).ToList();
+    var completedWaitingPaymentAppointments = Model
+        .Where(a => a.Status == AppointmentStatus.Completed && (a.Invoice is null || a.Invoice.PaymentStatus != PaymentStatus.Approved))
+        .ToList();
+    var pendingAppointments = Model.Where(a => a.Status == AppointmentStatus.Pending).ToList();
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <div class="eyebrow mb-2">Appointment control</div>
+            <h1 class="page-title h3 mb-1">Appointments by status</h1>
+            <p class="text-muted-strong mb-0">New requests are first, with approved, rejected, payment received, completed unpaid, and pending work split into separate sections.</p>
+        </div>
+        <a class="btn btn-outline-primary" asp-action="History">View History</a>
+    </div>
+</section>
+
+<section class="appointment-status-grid mb-4">
+    <div class="appointment-status-card">
+        <span>New</span>
+        <strong>@newAppointments.Count</strong>
+    </div>
+    <div class="appointment-status-card">
+        <span>Approved</span>
+        <strong>@approvedAppointments.Count</strong>
+    </div>
+    <div class="appointment-status-card">
+        <span>Rejected</span>
+        <strong>@rejectedAppointments.Count</strong>
+    </div>
+    <div class="appointment-status-card">
+        <span>Payment received</span>
+        <strong>@paymentReceivedAppointments.Count</strong>
+    </div>
+    <div class="appointment-status-card">
+        <span>Complete unpaid</span>
+        <strong>@completedWaitingPaymentAppointments.Count</strong>
+    </div>
+    <div class="appointment-status-card">
+        <span>Pending</span>
+        <strong>@pendingAppointments.Count</strong>
+    </div>
+</section>
+
+<section class="table-card appointment-section is-highlight mb-4">
+    <div class="table-card-header">
+        <div>
+            <h2>New Appointments</h2>
+            <p class="text-muted-strong mb-0">Fresh appointment requests and reschedules awaiting admin approval.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_AdminAppointmentsTable", newAppointments)
+</section>
+
+<section class="table-card appointment-section mb-4">
+    <div class="table-card-header">
+        <div>
+            <h2>Approved Appointments</h2>
+            <p class="text-muted-strong mb-0">Appointments approved for doctor workflow.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_AdminAppointmentsTable", approvedAppointments)
+</section>
+
+<section class="table-card appointment-section mb-4">
+    <div class="table-card-header">
+        <div>
+            <h2>Rejected Appointments</h2>
+            <p class="text-muted-strong mb-0">Requests declined by admin or doctor.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_AdminAppointmentsTable", rejectedAppointments)
+</section>
+
+<section class="table-card appointment-section mb-4">
+    <div class="table-card-header">
+        <div>
+            <h2>Payment Received</h2>
+            <p class="text-muted-strong mb-0">Appointments with approved invoice payments.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_AdminAppointmentsTable", paymentReceivedAppointments)
+</section>
+
+<section class="table-card appointment-section mb-4">
+    <div class="table-card-header">
+        <div>
+            <h2>Completed, Payment Not Received</h2>
+            <p class="text-muted-strong mb-0">Completed appointments that still need invoice generation or payment approval.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_AdminAppointmentsTable", completedWaitingPaymentAppointments)
+</section>
+
+<section class="table-card appointment-section">
+    <div class="table-card-header">
+        <div>
+            <h2>Pending Appointments</h2>
+            <p class="text-muted-strong mb-0">Appointments still marked as pending.</p>
+        </div>
+    </div>
+    @await Html.PartialAsync("_AdminAppointmentsTable", pendingAppointments)
+</section>

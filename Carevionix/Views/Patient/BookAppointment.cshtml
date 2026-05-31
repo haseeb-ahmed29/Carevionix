@@ -1,0 +1,61 @@
+@model BookAppointmentViewModel
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<section class="auth-panel">
+    <h1 class="page-title h3 mb-3">Book appointment</h1>
+    <form asp-action="BookAppointment" method="post" class="vstack gap-3">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div>
+            <label class="form-label" asp-for="Appointment.DoctorId"></label>
+            <select asp-for="Appointment.DoctorId" name="DoctorId" class="form-select">
+                <option value="">Select doctor</option>
+                @foreach (var doctor in Model.Doctors)
+                {
+                    <option value="@doctor.Id">@doctor.User.FullName - @doctor.Specialty</option>
+                }
+            </select>
+        </div>
+        <div class="availability-preview">
+            <div class="d-flex justify-content-between gap-2 align-items-center mb-2">
+                <strong>Doctor availability</strong>
+                <span class="text-muted-strong small">Select a doctor to see slots</span>
+            </div>
+            @foreach (var doctor in Model.Doctors)
+            {
+                <div class="doctor-slots d-none" data-doctor-id="@doctor.Id">
+                    @if (doctor.Availabilities.Any(a => a.IsAvailable))
+                    {
+                        @foreach (var slot in doctor.Availabilities.Where(a => a.IsAvailable).OrderBy(a => a.DayOfWeek).ThenBy(a => a.StartTime))
+                        {
+                            <span>@slot.DayOfWeek: @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No fixed availability added. Pick a future slot and system will validate.</span>
+                    }
+                </div>
+            }
+        </div>
+        <div><label class="form-label" asp-for="Appointment.ScheduledAt"></label><input asp-for="Appointment.ScheduledAt" name="ScheduledAt" class="form-control" type="datetime-local" /></div>
+        <div><label class="form-label" asp-for="Appointment.ConsultationType"></label><select asp-for="Appointment.ConsultationType" name="ConsultationType" class="form-select" asp-items="Html.GetEnumSelectList<ConsultationType>()"></select></div>
+        <div><label class="form-label" asp-for="Appointment.Reason"></label><textarea asp-for="Appointment.Reason" name="Reason" class="form-control" rows="3"></textarea></div>
+        <div><label class="form-label" asp-for="Appointment.InsuranceInfo"></label><input asp-for="Appointment.InsuranceInfo" name="InsuranceInfo" class="form-control" /></div>
+        <button class="btn btn-primary" type="submit">Book Appointment</button>
+    </form>
+</section>
+
+@section Scripts {
+    <script>
+        const doctorSelect = document.querySelector('[name="DoctorId"]');
+        const slotGroups = document.querySelectorAll('.doctor-slots');
+        function updateSlots() {
+            slotGroups.forEach(group => group.classList.toggle('d-none', group.dataset.doctorId !== doctorSelect.value));
+        }
+        doctorSelect.addEventListener('change', updateSlots);
+        updateSlots();
+    </script>
+}

@@ -1,0 +1,73 @@
+@model IReadOnlyList<DoctorAvailability>
+@{
+    ViewData["Title"] = "Availability";
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <div class="eyebrow mb-2">Schedule management</div>
+            <h1 class="page-title h3 mb-1">Manage availability</h1>
+            <p class="text-muted-strong mb-0">Keep your consultation calendar clean and conflict-free.</p>
+        </div>
+        <div class="dashboard-tabs" role="tablist" aria-label="Doctor dashboard tabs">
+            <a class="tab-link" asp-action="Dashboard">Overview</a>
+            <a class="tab-link" asp-action="Appointments">Appointments</a>
+            <a class="tab-link active" asp-action="Availability">Manage Availability</a>
+        </div>
+    </div>
+</section>
+
+<section class="section-panel mb-4">
+    <h2 class="h5 page-title mb-3">Add availability</h2>
+    <form asp-action="Availability" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="DayOfWeek" value="Monday" />
+        <div class="col-12">
+            <label class="form-label">Select days</label>
+            <div class="day-picker">
+                @foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
+                {
+                    <label><input name="Days" value="@day" type="checkbox" /> <span>@day</span></label>
+                }
+            </div>
+        </div>
+        <div class="col-md-4"><input name="StartTime" type="time" class="form-control" /></div>
+        <div class="col-md-4"><input name="EndTime" type="time" class="form-control" /></div>
+        <div class="col-md-2"><label class="form-check mt-2"><input name="IsAvailable" value="true" checked class="form-check-input" type="checkbox" /> Available</label></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Save</button></div>
+    </form>
+</section>
+
+<section class="table-card">
+    <div class="table-card-header">
+        <h2>Availability slots</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Day</th><th>Start</th><th>End</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var slot in Model)
+            {
+                <tr>
+                    <td>@slot.DayOfWeek</td>
+                    <td>@slot.StartTime</td>
+                    <td>@slot.EndTime</td>
+                    <td><span class="badge badge-soft">@(slot.IsAvailable ? "Available" : "Unavailable")</span></td>
+                    <td class="text-end">
+                        <form asp-action="DeleteAvailability" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@slot.Id" />
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No availability configured yet.</div>
+        }
+    </div>
+</section>

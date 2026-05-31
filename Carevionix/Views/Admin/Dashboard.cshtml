@@ -1,0 +1,71 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var chartItems = new[]
+    {
+        new { Label = "Doctors", Value = Model.Doctors, Tone = "teal" },
+        new { Label = "Patients", Value = Model.Patients, Tone = "blue" },
+        new { Label = "Appointments", Value = Model.Appointments, Tone = "green" },
+        new { Label = "Pending", Value = Model.PendingAppointments, Tone = "amber" },
+        new { Label = "Completed", Value = Model.CompletedConsultations, Tone = "violet" },
+        new { Label = "Records", Value = Model.HealthRecords, Tone = "pink" },
+        new { Label = "Messages", Value = Model.Messages, Tone = "cyan" },
+        new { Label = "Contacts", Value = Model.ContactSubmissions, Tone = "navy" }
+    };
+    var maxChartValue = Math.Max(1, chartItems.Max(item => item.Value));
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <div class="eyebrow mb-2">Administration</div>
+            <h1 class="page-title h3 mb-1">Carevionix operations dashboard</h1>
+            <p class="text-muted-strong mb-0">Monitor users, appointments, revenue, records, and system activity.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-primary" asp-action="ManageDoctors">Manage Doctors</a>
+            <a class="btn btn-outline-dark" asp-action="ManageAppointments">Appointments</a>
+            <a class="btn btn-outline-primary" asp-action="SystemControl">System Control</a>
+        </div>
+    </div>
+</section>
+
+<section class="stat-grid mb-4">
+    <div class="stat-tile"><div class="text-muted-strong">Doctors</div><div class="stat-value">@Model.Doctors</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Patients</div><div class="stat-value">@Model.Patients</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Appointments</div><div class="stat-value">@Model.Appointments</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Messages</div><div class="stat-value">@Model.Messages</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Records</div><div class="stat-value">@Model.HealthRecords</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Contacts</div><div class="stat-value">@Model.ContactSubmissions</div></div>
+    <div class="stat-tile"><div class="text-muted-strong">Revenue</div><div class="stat-value h4">PKR @Model.Revenue.ToString("N2")</div></div>
+</section>
+
+<section class="admin-chart-panel">
+    <div class="admin-chart-header">
+        <div>
+            <div class="eyebrow mb-2">Platform overview</div>
+            <h2 class="h4 mb-1">Admin activity chart</h2>
+            <p class="text-muted-strong mb-0">Live totals across users, appointments, records, and messages.</p>
+        </div>
+        <div class="admin-chart-total">
+            <span>Total appointments</span>
+            <strong>@Model.Appointments</strong>
+        </div>
+    </div>
+
+    <div class="admin-chart-bars" aria-label="Admin dashboard activity chart">
+        @foreach (var item in chartItems)
+        {
+            var barSize = $"{item.Value * 100.0 / maxChartValue:0.##}%";
+            <div class="admin-chart-row">
+                <div class="admin-chart-label">
+                    <span>@item.Label</span>
+                    <strong>@item.Value</strong>
+                </div>
+                <div class="admin-chart-track" aria-hidden="true">
+                    <div class="admin-chart-bar admin-chart-bar-@item.Tone" style="width: @barSize; min-width: @(item.Value > 0 ? "8px" : "0")"></div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

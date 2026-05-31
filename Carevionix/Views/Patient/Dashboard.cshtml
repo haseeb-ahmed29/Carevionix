@@ -1,0 +1,73 @@
+@model PatientDashboardViewModel
+@{
+    ViewData["Title"] = "Patient Dashboard";
+    var activeVideo = Model.Appointments.Count(a => a.Status == AppointmentStatus.Accepted && a.ConsultationType == ConsultationType.Video);
+    var unread = Model.Notifications.Count(n => !n.IsRead);
+    var completed = Model.Appointments.Count(a => a.Status == AppointmentStatus.Completed);
+    var totalAppointments = Model.Appointments.Count;
+}
+
+<section class="patient-vip-hero mb-4">
+    <div class="patient-vip-copy">
+        <div class="eyebrow mb-2">Patient home</div>
+        <h1>Welcome back, @Model.Patient.User.FullName</h1>
+        <p>Your care workspace for trusted doctors, appointments, records, prescriptions, and timely updates.</p>
+        <div class="patient-hero-actions">
+            <a class="btn btn-primary" asp-action="FindDoctors">Find Doctors</a>
+            <a class="btn btn-outline-dark" asp-action="BookAppointment">Book Appointment</a>
+            <a class="btn btn-outline-primary" asp-action="Profile">Edit Profile</a>
+        </div>
+        <div class="patient-trust-strip">
+            <div><strong>@totalAppointments</strong><span>Total visits</span></div>
+            <div><strong>@completed</strong><span>Completed</span></div>
+            <div><strong>@unread</strong><span>Unread alerts</span></div>
+        </div>
+    </div>
+    <div class="patient-hero-visual">
+        <img src="~/Images/Hospital.png" alt="Carevionix hospital" />
+    </div>
+</section>
+
+<section class="patient-command-grid mb-4">
+    <a class="command-tile premium-tile accent-a" asp-action="VideoCalls"><span class="tile-icon">V</span><strong>@activeVideo</strong><span>Accepted video rooms</span></a>
+    <a class="command-tile premium-tile accent-b" asp-action="HealthRecords"><span class="tile-icon">H</span><strong>Records</strong><span>Reports and scans</span></a>
+    <a class="command-tile premium-tile accent-c" asp-action="Notifications"><span class="tile-icon">N</span><strong>@unread</strong><span>Unread reminders</span></a>
+    <a class="command-tile premium-tile accent-d" asp-action="Prescriptions"><span class="tile-icon">Rx</span><strong>Rx</strong><span>Prescriptions</span></a>
+    <a class="command-tile premium-tile accent-a" asp-action="Profile"><span class="tile-icon">U</span><strong>Profile</strong><span>Personal details</span></a>
+</section>
+
+<section class="patient-feature-band mb-4">
+    <div class="feature-band-copy">
+        <div class="eyebrow mb-2">Care services</div>
+        <h2>Everything for your next consultation, already organized.</h2>
+        <p>Choose a doctor, keep your reports ready, receive updates, and manage follow-up care without losing context.</p>
+    </div>
+    <div class="feature-card-grid patient-feature-grid">
+        <a asp-action="FindDoctors">
+            <span>01</span>
+            <strong>Specialist search</strong>
+            <p>Find doctors by specialty, language, location, availability, and rating.</p>
+        </a>
+        <a asp-action="HealthRecords">
+            <span>02</span>
+            <strong>Private records</strong>
+            <p>Upload reports and share them with the selected doctor when needed.</p>
+        </a>
+        <a asp-action="Invoices">
+            <span>03</span>
+            <strong>Billing history</strong>
+            <p>Review consultation invoices and payment details from one clean view.</p>
+        </a>
+    </div>
+</section>
+
+<section class="table-card patient-table-card">
+    <div class="table-card-header">
+        <div>
+            <h2>Recent appointments</h2>
+            <p class="text-muted-strong mb-0">Latest requests and accepted consultations.</p>
+        </div>
+        <a class="btn btn-outline-primary" asp-action="MyAppointments">View all</a>
+    </div>
+    <partial name="_AppointmentsTable" model="Model.Appointments" />
+</section>

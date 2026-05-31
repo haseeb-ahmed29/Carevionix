@@ -1,0 +1,88 @@
+@model IReadOnlyList<Appointment>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead><tr><th>Date</th><th>Name</th><th>Patient Name</th><th>Type</th><th>Status</th><th>Reason</th><th>Actions</th></tr></thead>
+        <tbody>
+        @foreach (var appointment in Model)
+        {
+            var canOpenRoom = appointment.Status == AppointmentStatus.Accepted && appointment.ConsultationType is ConsultationType.Video or ConsultationType.Audio;
+            var canChat = appointment.Status == AppointmentStatus.Accepted && appointment.ConsultationType == ConsultationType.Chat;
+            var canFinish = appointment.Status == AppointmentStatus.Accepted;
+            <tr>
+                <td>@appointment.ScheduledAt.ToString("g")</td>
+                <td>
+                    <span class="avatar-pill">
+                        <img src="@(appointment.Patient?.User?.ProfileImagePath ?? Url.Content("~/Images/Petient Penal Hero Image.jpg"))" alt="" />
+                        <span>@(appointment.PatientName.Length > 0 ? appointment.PatientName : appointment.Patient?.User?.FullName)</span>
+                    </span>
+                </td>
+                <td>@(appointment.PatientName.Length > 0 ? appointment.PatientName : appointment.Patient?.User?.FullName)</td>
+                <td>@appointment.ConsultationType</td>
+                <td><span class="badge badge-soft">@appointment.Status</span></td>
+                <td>@appointment.Reason</td>
+                <td>
+                    <div class="d-flex flex-wrap gap-1">
+                        @if (appointment.Status == AppointmentStatus.Accepted)
+                        {
+                            <span class="status-badge is-active">Admin approved</span>
+                            <form asp-controller="Doctor" asp-action="RejectAppointment" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="appointmentId" value="@appointment.Id" />
+                                <button class="btn btn-sm btn-outline-dark" type="submit">Reject</button>
+                            </form>
+                        }
+                        else if (appointment.Status == AppointmentStatus.Rejected)
+                        {
+                            <span class="status-badge is-pending">Rejected</span>
+                        }
+                        else if (appointment.Status == AppointmentStatus.Completed)
+                        {
+                            <span class="status-badge is-active">Completed</span>
+                        }
+                        @if (canChat && appointment.Patient?.UserId is not null)
+                        {
+                            <a class="btn btn-sm btn-primary" asp-controller="Doctor" asp-action="Chat" asp-route-patientUserId="@appointment.Patient.UserId">Open Chat</a>
+                        }
+                        @if (canOpenRoom)
+                        {
+                            <form asp-controller="Doctor" asp-action="VideoConsultation" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="appointmentId" value="@appointment.Id" />
+                                <button class="btn btn-sm btn-primary" type="submit">@(appointment.ConsultationType == ConsultationType.Audio ? "Open Audio" : "Open Room")</button>
+                            </form>
+                        }
+                    </div>
+                    @if (canFinish)
+                    {
+                        <form asp-controller="Doctor" asp-action="CompleteAppointment" method="post" class="appointment-complete-form mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="AppointmentId" value="@appointment.Id" />
+                            <input name="Notes" class="form-control form-control-sm" placeholder="Completion notes" />
+                            <button class="btn btn-sm btn-primary" type="submit">Complete</button>
+                        </form>
+                    }
+                    <details class="mt-2">
+                        <summary class="small">Prescription</summary>
+                        <form asp-controller="Doctor" asp-action="CreatePrescription" method="post" class="row g-2 mt-1">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="AppointmentId" value="@appointment.Id" />
+                            <div class="col-md-6"><input name="Diagnosis" class="form-control form-control-sm" placeholder="Diagnosis" /></div>
+                            <div class="col-md-6"><input name="FollowUpDate" class="form-control form-control-sm" type="date" /></div>
+                            <div class="col-md-4"><input name="Medicines[0].MedicineName" class="form-control form-control-sm" placeholder="Medicine" /></div>
+                            <div class="col-md-4"><input name="Medicines[0].Dose" class="form-control form-control-sm" placeholder="Dose" /></div>
+                            <div class="col-md-4"><input name="Medicines[0].Duration" class="form-control form-control-sm" placeholder="Duration" /></div>
+                            <div class="col-12"><input name="Notes" class="form-control form-control-sm" placeholder="Notes" /></div>
+                            <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Save Prescription</button></div>
+                        </form>
+                    </details>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    @if (!Model.Any())
+    {
+        <div class="empty-state">No appointments assigned yet.</div>
+    }
+</div>

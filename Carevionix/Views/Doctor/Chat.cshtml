@@ -1,0 +1,30 @@
+@model IReadOnlyList<ChatMessage>
+@{
+    ViewData["Title"] = "Chat";
+    var otherUserId = Context.Request.Query["patientUserId"].ToString();
+}
+
+<section class="section-panel">
+    <h1 class="page-title h3 mb-3">Patient chat</h1>
+    <div class="vstack gap-2 mb-3">
+        @foreach (var message in Model)
+        {
+            var isOwnMessage = message.SenderId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var senderImage = message.Sender.ProfileImagePath ?? Url.Content(isOwnMessage ? "~/Images/Home Page hero image.jpg" : "~/Images/Petient Penal Hero Image.jpg");
+            <div class="p-3 border rounded-2 bg-white">
+                <span class="avatar-pill mb-2">
+                    <img src="@senderImage" alt="" />
+                    <strong>@(isOwnMessage ? "You" : "Patient")</strong>
+                </span>
+                <span class="text-muted-strong small">@message.Timestamp.ToLocalTime().ToString("g")</span>
+                <div>@message.Message</div>
+            </div>
+        }
+    </div>
+    <form asp-action="Chat" method="post" class="d-flex gap-2">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ReceiverId" value="@otherUserId" />
+        <input name="Message" class="form-control" placeholder="Write message" />
+        <button class="btn btn-primary" type="submit">Send</button>
+    </form>
+</section>

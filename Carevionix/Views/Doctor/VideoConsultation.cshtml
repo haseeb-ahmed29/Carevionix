@@ -1,0 +1,19 @@
+@model Consultation
+@{
+    ViewData["Title"] = Model.ConsultationType == ConsultationType.Audio ? "Audio Consultation" : "Video Consultation";
+}
+
+@{
+    ViewData["VideoRole"] = "doctor";
+}
+@Html.AntiForgeryToken()
+<partial name="_VideoConsultationRoom" model="Model" />
+
+<section class="section-panel mt-4">
+    <form asp-action="CompleteAppointment" method="post" class="vstack gap-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
+        <textarea name="Notes" class="form-control" rows="4" placeholder="Consultation notes"></textarea>
+        <button class="btn btn-primary" type="submit">Complete Consultation</button>
+    </form>
+</section>

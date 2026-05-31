@@ -1,0 +1,34 @@
+@model RegisterPatientDto
+@{
+    ViewData["Title"] = "Patient Registration";
+}
+
+<section class="auth-panel">
+    <div class="eyebrow mb-2">Patient account</div>
+    <h1 class="page-title h3 mb-3">Create patient profile</h1>
+    <form asp-action="RegisterPatient" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="col-12"><label asp-for="FullName" class="form-label">Full name</label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger small"></span></div>
+        <div class="col-12"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" autocomplete="username" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+        <div class="col-12"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" type="password" autocomplete="new-password" /><span asp-validation-for="Password" class="text-danger small"></span></div>
+        <div class="col-md-6"><label asp-for="PhoneNumber" class="form-label">Phone number</label><input asp-for="PhoneNumber" class="form-control" /></div>
+        <div class="col-md-6"><label asp-for="DateOfBirth" class="form-label">Date of birth</label><input asp-for="DateOfBirth" class="form-control" type="date" /></div>
+        <div class="col-md-6">
+            <label asp-for="Gender" class="form-label"></label>
+            <select asp-for="Gender" class="form-select">
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+        <div class="col-md-6"><label asp-for="InsuranceInfo" class="form-label">Insurance information</label><input asp-for="InsuranceInfo" class="form-control" /></div>
+        <div class="col-12"><label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control" /></div>
+        <div class="col-12"><label asp-for="MedicalHistory" class="form-label">Medical history</label><textarea asp-for="MedicalHistory" class="form-control" rows="3"></textarea></div>
+        <div class="col-12"><button class="btn btn-primary w-100" type="submit">Register Patient</button></div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

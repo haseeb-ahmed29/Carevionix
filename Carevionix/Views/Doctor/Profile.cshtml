@@ -1,0 +1,94 @@
+@model DoctorProfileViewModel
+@{
+    ViewData["Title"] = "Doctor Profile";
+    var profileImage = Model.Doctor.User.ProfileImagePath ?? Url.Content("~/Images/Home Page hero image.jpg");
+}
+
+<section class="hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <img class="profile-photo" src="@profileImage" alt="Dr. @Model.Doctor.User.FullName" />
+            <div>
+                <div class="eyebrow mb-2">Profile management</div>
+                <h1 class="page-title h3 mb-1">Dr. @Model.Doctor.User.FullName</h1>
+                <p class="text-muted-strong mb-0">@Model.Doctor.Specialty</p>
+            </div>
+        </div>
+        <span class="status-badge @(Model.Doctor.User.IsActive ? "is-active" : "is-pending")">@(Model.Doctor.User.IsActive ? "Active account" : "Inactive account")</span>
+    </div>
+</section>
+
+<div class="settings-grid">
+    <section class="section-panel">
+        <h2 class="h5 page-title mb-3">Account information</h2>
+        <form asp-action="Profile" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="col-md-6">
+                <label asp-for="Profile.FullName" class="form-label"></label>
+                <input asp-for="Profile.FullName" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Profile.PhoneNumber" class="form-label"></label>
+                <input asp-for="Profile.PhoneNumber" class="form-control" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Profile.Address" class="form-label"></label>
+                <input asp-for="Profile.Address" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Profile.Specialty" class="form-label"></label>
+                <input asp-for="Profile.Specialty" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Profile.Location" class="form-label"></label>
+                <input asp-for="Profile.Location" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Profile.Languages" class="form-label"></label>
+                <input asp-for="Profile.Languages" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Profile.Qualifications" class="form-label"></label>
+                <input asp-for="Profile.Qualifications" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Profile.ExperienceYears" class="form-label"></label>
+                <input asp-for="Profile.ExperienceYears" class="form-control" type="number" min="0" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Profile.ConsultationFee" class="form-label"></label>
+                <input asp-for="Profile.ConsultationFee" class="form-control" type="number" min="0" step="0.01" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Profile.Bio" class="form-label"></label>
+                <textarea asp-for="Profile.Bio" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary" type="submit">Save profile</button>
+            </div>
+        </form>
+    </section>
+
+    <aside class="section-panel">
+        <h2 class="h5 page-title mb-3">Profile image</h2>
+        <form asp-action="UpdateProfileImage" method="post" enctype="multipart/form-data" class="vstack gap-3 mb-4">
+            @Html.AntiForgeryToken()
+            <input class="form-control" type="file" name="profileImage" accept="image/png,image/jpeg,image/webp" />
+            <button class="btn btn-outline-primary" type="submit">Upload image</button>
+        </form>
+
+        <h2 class="h5 page-title mb-3">Change password</h2>
+        <form asp-action="ChangePassword" method="post" class="vstack gap-3">
+            @Html.AntiForgeryToken()
+            <input asp-for="Password.CurrentPassword" class="form-control" type="password" placeholder="Current password" />
+            <input asp-for="Password.NewPassword" class="form-control" type="password" placeholder="New password" />
+            <input asp-for="Password.ConfirmPassword" class="form-control" type="password" placeholder="Confirm password" />
+            <button class="btn btn-outline-dark" type="submit">Change password</button>
+        </form>
+    </aside>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
